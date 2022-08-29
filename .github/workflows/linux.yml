@@ -2,11 +2,18 @@ name: linux_build
 
 on:
   workflow_dispatch:
+    inputs:
+      new_release:
+        type: boolean
+        description: Force new Release
   schedule:
     - cron: '0 0 * * *'
   push:
+    paths-ignore:
+    - '**/*.md'
   pull_request:
-    branches: [ master ]
+    paths-ignore:
+    - '**/*.md'
 
 jobs:
   release:
@@ -54,6 +61,7 @@ jobs:
       - name: Check existing VSCodium tags/releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_RELEASE: ${{ github.event.inputs.new_release }}
         run: ./check_tags.sh
         if: env.SHOULD_DEPLOY == 'yes'
 
@@ -107,7 +115,7 @@ jobs:
       matrix:
         platform:
         - amd64
-        # - arm64
+        - arm64
 
     steps:
       - uses: actions/checkout@v3
@@ -118,27 +126,27 @@ jobs:
           ARCHITECTURE: ${{ matrix.platform }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
 
-      # - uses: docker/setup-qemu-action@v1
-      #   if: env.SHOULD_DEPLOY == 'yes'
+      - uses: docker/setup-qemu-action@v1
+        if: env.SHOULD_DEPLOY == 'yes'
 
-      # - uses: diddlesnaps/snapcraft-multiarch-action@v1
-      #   with:
-      #     path: stores/snapcraft
-      #     architecture: ${{ matrix.platform }}
-      #   id: build
-      #   if: env.SHOULD_DEPLOY == 'yes'
-
-      # - uses: diddlesnaps/snapcraft-review-action@v1
-      #   with:
-      #     snap: ${{ steps.build.outputs.snap }}
-      #     isClassic: 'true'
-      #   if: env.SHOULD_DEPLOY == 'yes'
-      - uses: snapcore/action-build@v1
+      - uses: diddlesnaps/snapcraft-multiarch-action@v1
         with:
           path: stores/snapcraft
+          architecture: ${{ matrix.platform }}
         id: build
         if: env.SHOULD_DEPLOY == 'yes'
 
+      - uses: diddlesnaps/snapcraft-review-action@v1
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          isClassic: 'true'
+        if: env.SHOULD_DEPLOY == 'yes'
+
+      # - uses: snapcore/action-build@v1
+      #   with:
+      #     path: stores/snapcraft
+      #   id: build
+      #   if: env.SHOULD_DEPLOY == 'yes'
 
       - uses: snapcore/action-publish@master
         env:

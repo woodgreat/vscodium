@@ -2,6 +2,9 @@
 
 set -e
 
+# include common functions
+. ./utils.sh
+
 cp -rp src/* vscode/
 cp -f LICENSE vscode/LICENSE.txt
 
@@ -92,6 +95,12 @@ jq -s '.[0] * .[1]' product.json.tmp ../product.json > product.json
 rm -f product.json.tmp
 
 cat product.json
+
+mv package.json package.json.bak
+package_json_changes="setpath(["\""version"\""]; "\""${RELEASE_VERSION}"\"") | setpath(["\""release"\""]; "\""${RELEASE_VERSION}"\"")"
+cat package.json.bak | jq "${package_json_changes}" > package.json
+gsed -i -E 's/"version": "(.*)\.([0-9]+)"/"version": "\1"/' package.json
+gsed -i -E 's/"release": "(.*)\.([0-9]+)"/"release": "\2"/' package.json
 
 ../undo_telemetry.sh
 

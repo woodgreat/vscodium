@@ -65,6 +65,10 @@ Firstly, create the container with:
 ```
 docker run -ti --volume=<local vscodium source>:/root/vscodium --name=vscodium-build-agent vscodium/vscodium-linux-build-agent:bionic-x64 bash
 ```
+like
+```
+docker run -ti --volume=$(pwd):/root/vscodium --name=vscodium-build-agent vscodium/vscodium-linux-build-agent:bionic-x64 bash
+```
 
 When inside the container, you can use the following commands to build:
 ```
@@ -75,13 +79,13 @@ npm install -g yarn
 
 cd /root/vscodium
 
-./get_repo.sh
+. get_repo.sh
 
 export SHOULD_BUILD=yes
 export OS_NAME=linux
 export VSCODE_ARCH=x64
 
-./build.sh
+. build.sh
 ```
 
 ### <a id="build-docker-arm32"></a>ARM 32bits
@@ -89,6 +93,10 @@ export VSCODE_ARCH=x64
 Firstly, create the container with:
 ```
 docker run -ti --volume=<local vscodium source>:/root/vscodium --name=vscodium-build-agent vscodium/vscodium-linux-build-agent:stretch-armhf bash
+```
+like
+```
+docker run -ti --volume=$(pwd):/root/vscodium --name=vscodium-build-agent vscodium/vscodium-linux-build-agent:stretch-armhf bash
 ```
 
 When inside the container, you can use the following commands to build:
@@ -98,7 +106,7 @@ sudo apt-get install -y nodejs desktop-file-utils
 
 cd /root/vscodium
 
-./get_repo.sh
+. get_repo.sh
 
 export SHOULD_BUILD=yes
 export OS_NAME=linux
@@ -106,7 +114,7 @@ export VSCODE_ARCH=armhf
 export npm_config_arch=armv7l
 export npm_config_force_process_config="true"
 
-./build.sh
+. build.sh
 ```
 
 ## <a id="patch-update-process"></a>Patch Update Process
