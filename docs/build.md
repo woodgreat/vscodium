@@ -10,6 +10,7 @@
 - [Build in Docker](#build-docker)
   - [X64](#build-docker-x64)
   - [ARM 32bits](#build-docker-arm32)
+- [Build Snap](#build-snap)
 - [Patch Update Process](#patch-update-process)
   - [Semi-Automated](#patch-update-process-semiauto)
   - [Manual](#patch-update-process-manual)
@@ -49,11 +50,17 @@
 
 ## <a id="build-scripts"></a>Build Scripts
 
-Each platform has its build helper script in the directory `build`.
+A build helper script can be found at `build/build.sh`.
 
-- Linux: `./build/build_linux.sh`
-- MacOS: `./build/build_macos.sh`
-- Windows: `powershell -ExecutionPolicy ByPass -File .\build\build_windows.ps1`
+- Linux: `./build/build.sh`
+- MacOS: `./build/build.sh`
+- Windows: `powershell -ExecutionPolicy ByPass -File .\build\build.ps1` or `"C:\Program Files\Git\bin\bash.exe" ./build/build.sh`
+
+### Insider
+
+The `insider` version can be built with `./build/build.sh -i` on the `insider` branch.
+
+You can try the lastest version with the command `./build/build.sh -il` but the patches might not be up to date.
 
 ## <a id="build-docker"></a>Build in Docker
 
@@ -115,6 +122,22 @@ export npm_config_arch=armv7l
 export npm_config_force_process_config="true"
 
 . build.sh
+```
+
+## <a id="build-snap"></a>Build Snap
+
+```
+# for the stable version
+cd ./stores/snapcraft/stable
+
+# for the insider version
+cd ./stores/snapcraft/insider
+
+# create the snap
+snapcraft --use-lxd
+
+# verify the snap
+review-tools.snap-review --allow-classic codium*.snap
 ```
 
 ## <a id="patch-update-process"></a>Patch Update Process
